@@ -16,6 +16,66 @@ async def version(ctx):
     await ctx.reply(verstr)
 
 @bot.command()
+async def inven(ctx):
+    fname=f"data/user{ctx.author.id}/userinfo{ctx.author.id}.data"
+    data=None
+    if os.path.isfile(fname):
+        data=ReadInven(fname)
+    sendData=""
+    for i in data:
+        sendData+=i
+    await ctx.reply(sendData)
+
+@bot.command()
+async def rein(ctx,agree=None):
+    fname=f"data/user{ctx.author.id}/userinfo{ctx.author.id}.data"
+    data=None
+    if os.path.isfile(fname):
+        data=ReadInven(fname)
+    level=int(data[1])
+    moa=int(data[3])
+    cost_ingre=[]
+    divmod(level,7)
+    for i in range(5):
+        if level>=i*6+1:
+            cost_ingre.append(((level-6*i)//2+1)*level)
+            print(cost_ingre)
+        else:
+            break
+    
+
+    cost_moa=1000*(level//5+1)*(level//10+1)*(level//15+1)
+    ingre=data[5:5+len(cost_ingre)]
+
+    if agree==None:
+        await ctx.reply(f"{cost_ingre} {cost_moa}moa필요\n{ingre} {moa}moa보유")
+        return
+    elif agree=="agree":
+        for i in range(len(ingre)):
+            if ingre[i]<cost_ingre[i]:
+                ctx.reply("재료 부족")
+                return
+            else:
+                data[5+i]-=cost_ingre[i]
+        if moa<cost_moa:
+            ctx.reply(f"{cost_moa-moa}모아 부족")
+            return
+        else:
+            data[3]-=cost_moa
+        success=99-3*(level-1)
+        dice=random.random()*100
+        if dice<success:
+            ctx.reply("success level+1")
+            data[1]+=1
+        else:
+            ctx.reply("fail")
+    data=inttostr(data)
+    with open(fname,"w") as f:
+        f.writelines(data)
+
+    
+
+@bot.command()
 async def dayget(ctx):
     
     fname=f"data/user{ctx.author.id}/userinfo{ctx.author.id}.data"
@@ -37,31 +97,46 @@ async def dayget(ctx):
                 break
     data=None
     if os.path.isfile(fname):
-        with open(fname) as f:
-            data=f.readlines()
-            data[3]=int(data[3])
-            data[reward[0]-1+5]=int(data[reward[0]-1+5])
-            data[3]+=reward[2]
-            data[reward[0]-1+5]+=reward[1]
-        with open(fname) as f:
-            for i in data:
-                f.write()
+        data=ReadInven(fname)
+        print(data)
+        data[3]=str(data[3]+reward[2])+"\n"
+        data[reward[0]-1+5]=str(data[reward[0]-1+5]+reward[1])+"\n"
+        data=inttostr(data)
+        with open(fname,"w") as f:
+            f.writelines(data)
     else:
-        CreateUser(reward,fname)
+        CreateUser(reward,fname,ctx.author.id)
 
     await ctx.reply(f"{reward}")
 
+def inttostr(data):
+    for i in range(len(data)):
+        if type(data[i])==int:
+            data[i]=str(data[i])+"\n"
+    return data
 
-def CreateUesr(reward,fname):
-    with open(fname) as f:
+def ReadInven(fname):
+    data=None
+    with open(fname,"r") as f:
+        data=f.readlines()
+
+    for i in range(len(data)):
+        try:
+            data[i]=int(data[i])
+        except:
+            pass
+    return data
+
+def CreateUser(reward,fname,userid):
+    os.makedirs(f"data/user{userid}")
+    with open(fname,"w") as f:
         f.write("level\n1\nmoa\n")
         f.write(f"{reward[2]}\nreinmat\n")
         for i in range(5):
             if i==reward[0]-1:
-                f.write(f"{}\n")
-        f.write("level\n1\n")
-        f.write("level\n1\n")
-        f.write("level\n1\n")
+                f.write(f"{reward[1]}\n")
+            else:
+                f.write("0\n")
     return
 
 def plusend(num):
