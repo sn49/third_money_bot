@@ -22,6 +22,7 @@ async def inven(ctx):
     if os.path.isfile(fname):
         data=ReadInven(fname)
     sendData=""
+    data=inttostr(data)
     for i in data:
         sendData+=i
     await ctx.reply(sendData)
@@ -32,10 +33,9 @@ async def rein(ctx,agree=None):
     data=None
     if os.path.isfile(fname):
         data=ReadInven(fname)
-    level=int(data[1])
-    moa=int(data[3])
+    level=data[1]
+    moa=data[3]
     cost_ingre=[]
-    divmod(level,7)
     for i in range(5):
         if level>=i*6+1:
             cost_ingre.append(((level-6*i)//2+1)*level)
@@ -44,7 +44,7 @@ async def rein(ctx,agree=None):
             break
     
 
-    cost_moa=1000*(level//5+1)*(level//10+1)*(level//15+1)
+    cost_moa=1000*(level//5+1)*(level//10+1)*(level//15+1)*level
     ingre=data[5:5+len(cost_ingre)]
 
     if agree==None:
@@ -53,19 +53,19 @@ async def rein(ctx,agree=None):
     elif agree=="agree":
         for i in range(len(ingre)):
             if ingre[i]<cost_ingre[i]:
-                ctx.reply("재료 부족")
+                await ctx.reply("재료 부족")
                 return
             else:
                 data[5+i]-=cost_ingre[i]
         if moa<cost_moa:
-            ctx.reply(f"{cost_moa-moa}모아 부족")
+            await ctx.reply(f"{cost_moa-moa}모아 부족")
             return
         else:
             data[3]-=cost_moa
         success=99-3*(level-1)
         dice=random.random()*100
         if dice<success:
-            ctx.reply("success level+1")
+            await ctx.reply("success level+1")
             data[1]+=1
         else:
             ctx.reply("fail")
