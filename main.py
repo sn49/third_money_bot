@@ -1,15 +1,44 @@
 
+from dis import dis
 from fileinput import filename
+import discord
 import orjson
 
 from nextcord.ext import commands
 import random
 import os
+import datetime
 
 bot=commands.Bot(command_prefix="$")
 
-version={"bot order":3,"major":1,"minor":0,"fix":0}
-verstr=f'''{version["bot order"]}.{version["major"]}.{version["minor"]}.{version["fix"]}'''
+testmode=False
+modeString=""
+
+version={"bot order":3,"major":1,"minor":1,"fix":0}
+verstr=f'''V{version["bot order"]}.{version["major"]}.{version["minor"]}.{version["fix"]}'''
+
+@bot.event
+async def on_ready():
+    global modeString
+    if input("test입력시 test모드")=="test":
+        testmode=True
+        modeString="test"
+
+        await bot.change_presence(activity=discord.Game(name="TESTMODE"))
+
+    else:
+        testmode=False
+        modeString="main"
+        await bot.change_presence(activity=discord.Game(name=verstr))
+
+    try:
+        os.makedirs(f"data/{modeString}")
+    except:
+        pass
+
+@bot.command()
+async def mode(ctx):
+    await ctx.send(modeString)
 
 @bot.command()
 async def version(ctx):
@@ -17,7 +46,8 @@ async def version(ctx):
 
 @bot.command()
 async def inven(ctx):
-    fname=f"data/user{ctx.author.id}/userinfo{ctx.author.id}.data"
+    global modeString
+    fname=f"data/{modeString}/user{ctx.author.id}/userinfo{ctx.author.id}.data"
     data=None
     if os.path.isfile(fname):
         data=ReadInven(fname)
@@ -29,11 +59,19 @@ async def inven(ctx):
 
 @bot.command()
 async def rein(ctx,agree=None):
-    fname=f"data/user{ctx.author.id}/userinfo{ctx.author.id}.data"
+    global modeString
+    fname=f"data/{modeString}/user{ctx.author.id}/userinfo{ctx.author.id}.data"
     data=None
     if os.path.isfile(fname):
         data=ReadInven(fname)
     level=data[1]
+
+    maxlevel=6
+
+    if level==maxlevel:
+        await ctx.reply("최고 레벨")
+        return
+
     moa=data[3]
     cost_ingre=[]
     for i in range(5):
@@ -77,8 +115,16 @@ async def rein(ctx,agree=None):
 
 @bot.command()
 async def dayget(ctx):
-    
-    fname=f"data/user{ctx.author.id}/userinfo{ctx.author.id}.data"
+    global modeString
+    now=datetime.datetime.now()
+    today=f"{now.year}-{now.month}-{now.day}"
+    fname=f"data/{modeString}/user{ctx.author.id}/userinfo{ctx.author.id}.data"
+    fname2=f"data/{modeString}/user{ctx.author.id}/dailygift{ctx.author.id}.data"
+    if os.path.isfile(fname2):
+        with open(fname2,"r") as f:
+            if f.readlines()[1]==today:
+                await ctx.reply("이미 받음")
+                return
     
     reward=[]
     prob=[48,32,16,3,1]
@@ -106,8 +152,12 @@ async def dayget(ctx):
             f.writelines(data)
     else:
         CreateUser(reward,fname,ctx.author.id)
+    with open(fname2,"w") as f:
+        f.writelines("dayget\n"+today)
 
     await ctx.reply(f"{reward}")
+
+
 
 def inttostr(data):
     for i in range(len(data)):
@@ -128,7 +178,7 @@ def ReadInven(fname):
     return data
 
 def CreateUser(reward,fname,userid):
-    os.makedirs(f"data/user{userid}")
+    os.makedirs(f"data/{modeString}/user{userid}")
     with open(fname,"w") as f:
         f.write("level\n1\nmoa\n")
         f.write(f"{reward[2]}\nreinmat\n")
