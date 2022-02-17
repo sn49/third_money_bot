@@ -8,9 +8,10 @@ from nextcord.ext import commands
 import random
 import os
 import datetime
+from secret import opentime
 
-opentime=datetime.datetime(2022,2,17,18)
-print(opentime)
+optime=opentime.optime
+print(optime)
 
 bot=commands.Bot(command_prefix="$$")
 
@@ -210,4 +211,4 @@ def plusend(num):
         sum+=i+1
     return sum
 
-bot.run(open("token.txt").read())
+bot.run(open("secret/token.txt").read())
