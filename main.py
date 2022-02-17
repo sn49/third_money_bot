@@ -9,13 +9,28 @@ import random
 import os
 import datetime
 
-bot=commands.Bot(command_prefix="$")
+opentime=datetime.datetime(2022,2,17,18)
+print(opentime)
+
+bot=commands.Bot(command_prefix="$$")
 
 testmode=False
 modeString=""
 
 version={"bot order":3,"major":1,"minor":1,"fix":0}
 verstr=f'''V{version["bot order"]}.{version["major"]}.{version["minor"]}.{version["fix"]}'''
+
+@bot.event
+async def on_message(msg):
+    if str(msg.content).startswith('$$'):
+        if datetime.datetime.now()<opentime:
+            await msg.reply(f"{opentime}에 오픈")
+            return
+        else:
+            await bot.process_commands(msg)
+
+        
+
 
 @bot.event
 async def on_ready():
