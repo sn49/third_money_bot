@@ -1,7 +1,7 @@
 
 from dis import dis
 from fileinput import filename
-import discord
+import nextcord
 import orjson
 
 from nextcord.ext import commands
@@ -9,6 +9,7 @@ import random
 import os
 import datetime
 from secret import opentime
+import usermanage
 
 optime=opentime.optime
 print(optime)
@@ -24,8 +25,8 @@ verstr=f'''V{version["bot order"]}.{version["major"]}.{version["minor"]}.{versio
 @bot.event
 async def on_message(msg):
     if str(msg.content).startswith('$$'):
-        if datetime.datetime.now()<opentime:
-            await msg.reply(f"{opentime}에 오픈")
+        if datetime.datetime.now()<optime:
+            await msg.reply(f"{optime}에 오픈")
             return
         else:
             await bot.process_commands(msg)
@@ -40,17 +41,20 @@ async def on_ready():
         testmode=True
         modeString="test"
 
-        await bot.change_presence(activity=discord.Game(name="TESTMODE"))
+        await bot.change_presence(activity=nextcord.Game(name="TESTMODE"))
 
     else:
         testmode=False
         modeString="main"
-        await bot.change_presence(activity=discord.Game(name=verstr))
+        await bot.change_presence(activity=nextcord.Game(name=verstr))
 
     try:
         os.makedirs(f"data/{modeString}")
     except:
         pass
+
+    with open("secret/modeString.txt","w") as f:
+        f.write(modeString)
 
 @bot.command()
 async def mode(ctx):
@@ -167,7 +171,7 @@ async def dayget(ctx):
         with open(fname,"w") as f:
             f.writelines(data)
     else:
-        CreateUser(reward,fname,ctx.author.id)
+        usermanage.CreateUser(reward,fname,ctx.author.id)
     with open(fname2,"w") as f:
         f.writelines("dayget\n"+today)
 
@@ -203,7 +207,7 @@ def CreateUser(reward,fname,userid):
                 f.write(f"{reward[1]}\n")
             else:
                 f.write("0\n")
-    return
+    
 
 def plusend(num):
     sum=0
