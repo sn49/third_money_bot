@@ -12,8 +12,7 @@ import usermanage
 import logmanage
 import reinforce
 
-optime = opentime.optime
-print(optime)
+optime = opentime
 
 bot = commands.Bot(command_prefix="$$")
 
@@ -27,8 +26,11 @@ verstr = f"""V{version["bot order"]}.{version["major"]}.{version["minor"]}.{vers
 @bot.event
 async def on_message(msg):
     if str(msg.content).startswith(bot.command_prefix):
-        if datetime.datetime.now() < optime:
-            await msg.reply(f"{optime}에 오픈")
+        now = datetime.datetime.now()
+        wd = now.weekday()
+        min = now.minute
+        if (wd == 0 or wd == 3) and now.hour == 14 and 20 <= min and min < 40:
+            await msg.reply(f"점검시간")
             return
         else:
             await bot.process_commands(msg)
