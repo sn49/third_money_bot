@@ -1,9 +1,6 @@
 import os
 import datetime
-import reinforce
-from tkinter import Y
 
-from matplotlib.pyplot import ylim
 
 
 def CheckToday(now):
