@@ -19,7 +19,7 @@ bot = commands.Bot(command_prefix="$$")
 testmode = False
 modeString = ""
 
-version = {"bot order": 3, "major": 1, "minor": 1, "fix": 0}
+version = {"bot order": 3, "major": 1, "minor": 2, "fix": 0}
 verstr = f"""V{version["bot order"]}.{version["major"]}.{version["minor"]}.{version["fix"]}"""
 
 
