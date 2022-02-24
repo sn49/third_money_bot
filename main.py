@@ -19,7 +19,7 @@ bot = commands.Bot(command_prefix="$$")
 testmode = False
 modeString = ""
 
-version = {"bot order": 3, "major": 1, "minor": 2, "fix": 0}
+version = {"bot order": 3, "major": 1, "minor": 2, "fix": 1}
 verstr = f"""V{version["bot order"]}.{version["major"]}.{version["minor"]}.{version["fix"]}"""
 
 
@@ -93,6 +93,7 @@ async def rein(ctx, agree=None):
     if os.path.isfile(fname):
         data = ReadInven(fname)
     level = data[1]
+
 
     if modeString == "test":
         maxlevel = 13
