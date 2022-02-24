@@ -94,7 +94,11 @@ async def rein(ctx, agree=None):
         data = ReadInven(fname)
     level = data[1]
 
-    maxlevel = 7
+
+    if modeString == "test":
+        maxlevel = 13
+    elif modeString == "main":
+        maxlevel = 7
 
     if level == maxlevel:
         await ctx.reply("최고 레벨")
