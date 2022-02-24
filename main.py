@@ -19,7 +19,7 @@ bot = commands.Bot(command_prefix="$$")
 testmode = False
 modeString = ""
 
-version = {"bot order": 3, "major": 1, "minor": 1, "fix": 0}
+version = {"bot order": 3, "major": 1, "minor": 2, "fix": 1}
 verstr = f"""V{version["bot order"]}.{version["major"]}.{version["minor"]}.{version["fix"]}"""
 
 
@@ -94,7 +94,7 @@ async def rein(ctx, agree=None):
         data = ReadInven(fname)
     level = data[1]
 
-    maxlevel = 6
+    maxlevel = 7
 
     if level == maxlevel:
         await ctx.reply("최고 레벨")
